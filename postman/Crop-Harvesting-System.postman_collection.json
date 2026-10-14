@@ -1,0 +1,339 @@
+{
+  "info": {
+    "name": "Crop Harvesting System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Authenticated API checks. Postman keeps session cookies in its cookie jar; retrieve a fresh CSRF token before each state-changing request."
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Get CSRF token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/csrf"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CSRF token is returned', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.collectionVariables.set('csrfToken', pm.response.json().token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Register farmer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{userName}}\",\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/logout"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Crops",
+      "item": [
+        {
+          "name": "Get all crops",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/crops"
+          },
+          "response": []
+        },
+        {
+          "name": "Create crop",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cropName\": \"Wheat\",\n  \"cropType\": \"Cereal\",\n  \"cropVariety\": \"HD 2967\",\n  \"fieldLocation\": \"North Field A\",\n  \"cultivatedArea\": 12.5,\n  \"sowingDate\": \"2026-01-10\",\n  \"expectedHarvestDate\": \"2026-10-10\",\n  \"farmerName\": \"{{userName}}\",\n  \"notes\": \"Postman verification record.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/crops"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Crop created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.collectionVariables.set('cropId', pm.response.json().id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get crop by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/crops/{{cropId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Update crop",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cropName\": \"Wheat\",\n  \"cropType\": \"Cereal\",\n  \"cropVariety\": \"HD 2967\",\n  \"fieldLocation\": \"North Field B\",\n  \"cultivatedArea\": 13.5,\n  \"sowingDate\": \"2026-01-10\",\n  \"expectedHarvestDate\": \"2026-10-10\",\n  \"farmerName\": \"{{userName}}\",\n  \"notes\": \"Updated Postman verification record.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/crops/{{cropId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Harvests",
+      "item": [
+        {
+          "name": "Get all harvest records",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/harvests"
+          },
+          "response": []
+        },
+        {
+          "name": "Create harvest record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cropId\": {{cropId}},\n  \"farmerName\": \"{{userName}}\",\n  \"fieldLocation\": \"North Field A\",\n  \"plannedHarvestDate\": \"2026-10-10\",\n  \"actualHarvestDate\": \"2026-10-10\",\n  \"harvestedQuantity\": 4500.0,\n  \"status\": \"Completed\",\n  \"notes\": \"Postman verification record.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/harvests"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Harvest record created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "    pm.collectionVariables.set('harvestId', pm.response.json().id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get harvest record by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/harvests/{{harvestId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Update harvest record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cropId\": {{cropId}},\n  \"farmerName\": \"{{userName}}\",\n  \"fieldLocation\": \"North Field B\",\n  \"plannedHarvestDate\": \"2026-10-10\",\n  \"actualHarvestDate\": \"2026-10-11\",\n  \"harvestedQuantity\": 4700.0,\n  \"status\": \"In Progress\",\n  \"notes\": \"Updated Postman verification record.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/harvests/{{harvestId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete harvest record",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/harvests/{{harvestId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Get dashboard stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/dashboard/stats"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "Delete crop (run after deleting its harvest record)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-XSRF-TOKEN",
+                "value": "{{csrfToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/crops/{{cropId}}"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "csrfToken",
+      "value": ""
+    },
+    {
+      "key": "userName",
+      "value": ""
+    },
+    {
+      "key": "userEmail",
+      "value": ""
+    },
+    {
+      "key": "userPassword",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "cropId",
+      "value": ""
+    },
+    {
+      "key": "harvestId",
+      "value": ""
+    }
+  ]
+}
